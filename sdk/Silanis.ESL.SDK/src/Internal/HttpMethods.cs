@@ -440,14 +440,14 @@ namespace Silanis.ESL.SDK.Internal
 
         public static byte [] DeleteHttp (AuthHeaderGenerator authHeader, string path, byte [] content, IDictionary<string, string> headers)
         {
-            headers.Add (authHeader.Name, authHeader.Value);
+            headers[authHeader.Name] =  authHeader.Value;
             return DeleteHttp (path, content, headers);
         }
 
         public static byte [] DeleteHttp (string apiToken, string path, byte [] content, IDictionary<string, string> headers)
         {
         
-            headers.Add ("Authorization", "Basic " + apiToken);
+            headers["Authorization"] = "Basic " + apiToken;
             return DeleteHttp (path, content, headers);
         }
 

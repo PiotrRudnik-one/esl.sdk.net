@@ -11,8 +11,10 @@ namespace SDK.Examples
         public void VerifyResult ()
         {
             example.Run ();
-            Assert.AreEqual (example.filesAfterUpload.Count, 1);
-            Assert.AreEqual (example.filesAfterDelete.Count, 0);
+            Assert.AreEqual (example.filesAfterUpload.Count, 2);
+            Assert.AreEqual (example.filesAfterDelete.Count, 1);
+
+            Assert.AreEqual (example.exception.ServerError.MessageKey, "error.validation.attachments.delete.completedTransaction");
 
         }
     }

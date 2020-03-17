@@ -18,7 +18,6 @@ namespace SDK.Examples
         private Stream attachmentInputStream1;
 
         private Signer signer1;
-        private string attachment1Id;
 
         public readonly string NAME1 = "Driver's license";
         public readonly string DESCRIPTION1 = "Please upload a scanned copy of your driver's license.";
@@ -26,8 +25,10 @@ namespace SDK.Examples
         public IList<AttachmentRequirement> signer1Attachments;
         private AttachmentRequirement signer1Att1;
         public readonly string ATTACHMENT_FILE_NAME1 = "The attachment1 for signer1.pdf";
+        public readonly string ATTACHMENT_FILE_NAME2 = "The attachment1 for signer2.pdf";
         public IList<AttachmentFile> filesAfterUpload;
         public IList<AttachmentFile> filesAfterDelete;
+        public EslServerException exception;
 
 
 
@@ -54,7 +55,7 @@ namespace SDK.Examples
                     .WithSigner(signer1)
                     .WithDocument(DocumentBuilder.NewDocumentNamed("test document")
                                   .FromStream(fileStream1, DocumentType.PDF)
-                                  .WithSignature(SignatureBuilder.SignatureFor(email1)
+                                  .WithSignature(SignatureBuilder.SignatureFor(senderEmail)
                                   .Build())
                                   .Build())
                     .Build();
@@ -67,6 +68,10 @@ namespace SDK.Examples
             byte [] attachment1ForSigner1FileContent = new StreamDocumentSource (attachmentInputStream1).Content ();
             eslClient.UploadAttachment (packageId, signer1Att1.Id, ATTACHMENT_FILE_NAME1,
                     attachment1ForSigner1FileContent, SIGNER1_ID);
+
+            eslClient.UploadAttachment (packageId, signer1Att1.Id, ATTACHMENT_FILE_NAME2,
+                    attachment1ForSigner1FileContent, SIGNER1_ID);
+
 
             retrievedPackage = eslClient.GetPackage (packageId);
             signer1Att1 = retrievedPackage.GetSigner (email1).GetAttachmentRequirement (NAME1);
@@ -81,6 +86,19 @@ namespace SDK.Examples
             signer1Att1 = retrievedPackage.GetSigner (email1).GetAttachmentRequirement (NAME1);
 
             filesAfterDelete = signer1Att1.Files;
+
+            eslClient.SignDocuments (packageId);
+            eslClient.PackageService.MarkComplete (packageId);
+         
+            try 
+            {
+                eslClient.DeleteAttachmentFile (packageId, signer1Att1.Id, filesAfterUpload[1].Id, SIGNER1_ID);
+            } 
+            catch (EslServerException excp) 
+            {
+                exception = excp;
+            }
+
         }
 
     }
